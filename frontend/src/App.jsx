@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import './App.css' // අලුතින් හදපු CSS ෆයිල් එක ලින්ක් කිරීම
+import './App.css' 
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
-  const API_URL = 'http://127.0.0.1:8000/tasks/';
+  const API_URL = 'https://smart-task-manager-wmtl.onrender.com/tasks/';
 
   useEffect(() => {
     fetch(API_URL)
