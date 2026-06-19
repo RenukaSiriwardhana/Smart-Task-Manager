@@ -1,20 +1,32 @@
 from pydantic import BaseModel
 from typing import Optional
 
-# Base schema with common attributes
+# --- NEW: User Schemas ---
+# For creating a new user (receives plain password)
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+# For returning user info (NEVER return the password!)
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    
+    class Config:
+        from_attributes = True
+
+# --- UPDATED: Task Schemas ---
 class TaskBase(BaseModel):
     title: str
-    description: Optional[str] = None
+    description: Optional[str] = ""
 
-# Schema for creating a new task (inherits from TaskBase)
 class TaskCreate(TaskBase):
     pass
 
-# Schema for returning a task (includes id and completed status)
 class TaskResponse(TaskBase):
     id: int
     completed: bool
+    owner_id: int # NEW: Links to the user who created it
 
-    # Tell Pydantic to read data even if it is an ORM model (like our SQLAlchemy model)
     class Config:
         from_attributes = True

@@ -1,201 +1,283 @@
-/* Import the 'Poppins' font from Google Fonts for a modern, clean look */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+/* --- UI CLONE STYLES --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-/* Full page background with a beautiful deep blue color */
-body {
-  background-color: #0f172a; /* Dark modern background */
-  font-family: 'Poppins', sans-serif;
+:root {
+  --bg-gradient: linear-gradient(135deg, #e0e8f5 0%, #f4f7f6 100%);
+  --card-bg: #ffffff;
+  --text-main: #1e2022;
+  --text-muted: #959cb6;
+  --primary: #0056FF; 
+  --primary-hover: #0044cc;
+  --border-color: #e8ecef;
+  --input-bg: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+/* --- AUTHENTICATION SCREEN --- */
+.auth-wrapper, .dashboard-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  color: #333;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  padding: 20px;
   position: relative;
-  z-index: 0;
 }
 
-/* --- NEW: Decorative Floating Orbs in the background --- */
-/* Top left glowing orb */
-body::before {
+.auth-wrapper::before, .auth-wrapper::after {
   content: '';
   position: absolute;
-  top: -10%;
-  left: -10%;
-  width: 400px;
-  height: 400px;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
   border-radius: 50%;
-  filter: blur(80px); /* Makes it look like a glowing light */
-  opacity: 0.6;
+  filter: blur(60px);
   z-index: -1;
 }
-
-/* Bottom right glowing orb */
-body::after {
-  content: '';
-  position: absolute;
-  bottom: -10%;
-  right: -10%;
-  width: 500px;
-  height: 500px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
-  border-radius: 50%;
-  filter: blur(100px); /* Makes it look like a glowing light */
-  opacity: 0.5;
-  z-index: -1;
+.auth-wrapper::before {
+  width: 300px;
+  height: 300px;
+  background: rgba(0, 86, 255, 0.1);
+  top: -50px;
+  left: -50px;
 }
-/* -------------------------------------------------------- */
+.auth-wrapper::after {
+  width: 250px;
+  height: 250px;
+  background: rgba(0, 200, 150, 0.08);
+  bottom: -20px;
+  right: -20px;
+}
 
-/* Main container (Card) positioned in the center */
-.app-container {
-  /* NEW: Glassmorphism effect (Semi-transparent white with blur) */
-  background: rgba(255, 255, 255, 0.90);
-  backdrop-filter: blur(15px); /* Blurs the background behind the card */
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle white border */
-  
-  width: 100%;
-  max-width: 550px;
-  border-radius: 20px;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+.auth-card, .dashboard-card {
+  background: var(--card-bg);
   padding: 40px 30px;
-  margin: 20px;
+  border-radius: 30px; 
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 380px;
 }
 
-/* Main application heading */
-.header {
+.dashboard-card {
+  max-width: 600px;
+}
+
+.illustration-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  height: 140px;
+}
+
+.illustration-container img {
+  height: 100%;
+  object-fit: contain;
+}
+
+h2 {
+  color: #1e2022;
+  margin-bottom: 5px;
   text-align: center;
-  color: #1e293b;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  text-align: center;
   margin-bottom: 30px;
-  font-size: 32px;
-  font-weight: 600;
+  font-size: 0.8rem;
 }
 
-/* Input section container for typing new tasks */
-.input-group {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 35px;
-}
-
-/* Styling the input field */
-.task-input {
-  flex-grow: 1;
-  padding: 15px;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 16px;
-  outline: none;
-  background-color: rgba(255, 255, 255, 0.9) !important; 
-  color: #1e293b !important; 
-  transition: all 0.3s;
-  font-family: 'Poppins', sans-serif;
-}
-
-.task-input::placeholder { 
-  color: #94a3b8; 
-}
-
-/* Glow effect when typing in the input box */
-.task-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-}
-
-/* Styling for the Add Task button */
-.btn-add {
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
-  color: white;
-  border: none;
-  padding: 0 25px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-/* Button hover effects */
-.btn-add:hover {
-  transform: translateY(-2px); 
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
-}
-
-/* Task list container */
-.task-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* Individual task item styling */
-.task-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 18px;
-  background-color: #ffffff;
-  border-radius: 12px;
+/* --- INPUT FIELDS WITH ICONS --- */
+.input-wrapper {
+  position: relative;
   margin-bottom: 15px;
-  transition: all 0.3s ease;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
 
-/* Slide slightly to the right on hover */
-.task-item:hover {
-  transform: translateX(5px); 
-  box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-  border-color: #cbd5e1;
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  opacity: 0.6;
 }
 
-/* Text styling for the task title */
-.task-text {
-  flex-grow: 1;
-  font-size: 16px;
-  color: #334155;
+/* NEW: Eye Icon for Show/Hide Password */
+.eye-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.eye-icon:hover {
+  opacity: 1;
+}
+
+input {
+  width: 100%;
+  /* Adjusted padding to make room for both left and right icons */
+  padding: 14px 45px 14px 45px; 
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background-color: var(--input-bg);
+  transition: all 0.3s;
+}
+
+input::placeholder {
+  color: #b0b8c1;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.error-text {
+  color: #ff4757;
+  font-size: 0.8rem;
+  margin-bottom: 15px;
+  text-align: center;
   font-weight: 500;
 }
 
-/* Strikethrough effect for completed tasks */
-.task-text.completed {
-  text-decoration: line-through;
-  color: #94a3b8;
+/* --- LINKS AND TERMS --- */
+.forget-password {
+  text-align: right;
+  margin-bottom: 20px;
 }
 
-/* Custom green accent color for the checkbox */
-.checkbox {
-  width: 24px;
-  height: 24px;
+.forget-password a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.terms-text {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.terms-text strong {
+  color: var(--primary);
   cursor: pointer;
-  accent-color: #10b981; 
 }
 
-/* Base styling for Action buttons (Edit & Delete) */
-.btn-action {
-  background: none;
+/* --- BUTTONS --- */
+.primary-btn {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--primary);
+  color: white;
   border: none;
+  border-radius: 50px; 
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 20px;
-  padding: 8px;
-  border-radius: 8px;
-  transition: all 0.2s;
+  transition: background-color 0.3s;
+  box-shadow: 0 8px 15px rgba(0, 86, 255, 0.2);
+}
+
+.primary-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+/* --- BOTTOM TOGGLE --- */
+.toggle-text {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.toggle-link {
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggle-link:hover {
+  text-decoration: underline;
+}
+
+/* --- DASHBOARD STYLES --- */
+.header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  margin-bottom: 30px;
 }
 
-/* Yellow hover effect for the Edit button */
-.btn-edit:hover { 
-  background-color: #fef08a; 
-  transform: scale(1.1); 
+.logout-btn {
+  padding: 8px 20px;
+  background-color: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
-/* Red hover effect for the Delete button */
-.btn-delete:hover { 
-  background-color: #fecaca; 
-  transform: scale(1.1); 
+.task-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.task-form input {
+  padding-left: 15px; 
+  padding-right: 15px;
+}
+
+.add-btn {
+  padding: 0 25px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.task-list {
+  list-style: none;
+}
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.delete-btn {
+  color: #ff4757;
+  background: transparent;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
 }
