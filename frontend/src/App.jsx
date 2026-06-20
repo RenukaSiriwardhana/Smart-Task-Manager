@@ -37,6 +37,7 @@ function App() {
   const [expandedTasks, setExpandedTasks] = useState({});
 
   // --- 150ms BROWSER AUTOFILL KILLER TIMER ---
+  // Prevents browsers from forcefully auto-filling saved passwords into wrong fields
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!token) {
@@ -48,6 +49,7 @@ function App() {
     return () => clearTimeout(timer);
   }, [isLoginMode, token, showLanding]);
 
+  // Fetch tasks immediately upon successful login
   useEffect(() => {
     if (token) {
       fetchTasks();
@@ -107,6 +109,16 @@ function App() {
   const addTask = async (e) => {
     if (e) e.preventDefault();
     if (!newTaskTitle || !dueDate || !dueTime) return;
+
+    // --- NEW SAFETY CHECK: Prevent Past Date/Time Selection ---
+    const selectedDateTime = new Date(`${dueDate}T${dueTime}`);
+    const currentDateTime = new Date();
+
+    if (selectedDateTime < currentDateTime) {
+      alert("Please select a future date and time! You cannot add tasks to the past. 🚫");
+      return; // Stop execution here, prevent task creation
+    }
+    // -----------------------------------------------------------
 
     setIsGenerating(true);
     const response = await fetch(`${API_URL}/tasks/`, {
@@ -191,7 +203,6 @@ function App() {
             
             <div className="input-wrapper">
               <span className="input-icon">🔒</span>
-              {}
               <input 
                 type={showPassword ? "text" : "password"} 
                 name={"pwd_" + Math.random()}
@@ -206,7 +217,6 @@ function App() {
             {!isLoginMode && (
               <div className="input-wrapper">
                 <span className="input-icon">🔒</span>
-                { }
                 <input 
                   type={showConfirmPassword ? "text" : "password"} 
                   name={"conf_" + Math.random()}
