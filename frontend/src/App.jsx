@@ -6,7 +6,7 @@ import startupImg from './assets/startup.png';
 import loginImg from './assets/login.png';
 import signupImg from './assets/signup.png';
 
-const API_URL = 'http://127.0.0.1:8000';
+const API_URL = 'https://smart-task-manager-qxgj.onrender.com';
 
 const getCurrentDate = () => new Date().toISOString().split('T')[0];
 const getCurrentTime = () => {
