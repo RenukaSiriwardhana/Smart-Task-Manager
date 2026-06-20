@@ -1,32 +1,32 @@
 from pydantic import BaseModel
 from typing import Optional
 
-# --- NEW: User Schemas ---
-# For creating a new user (receives plain password)
 class UserCreate(BaseModel):
     username: str
     password: str
 
-# For returning user info (NEVER return the password!)
 class UserResponse(BaseModel):
     id: int
     username: str
-    
     class Config:
         from_attributes = True
 
-# --- UPDATED: Task Schemas ---
-class TaskBase(BaseModel):
+class TaskCreate(BaseModel):
     title: str
-    description: Optional[str] = ""
+    due_date: Optional[str] = None 
+    due_time: Optional[str] = None 
 
-class TaskCreate(TaskBase):
-    pass
+# New schema for handling status updates explicitly via request body
+class TaskUpdate(BaseModel):
+    is_completed: bool
 
-class TaskResponse(TaskBase):
+class TaskResponse(BaseModel):
     id: int
-    completed: bool
-    owner_id: int # NEW: Links to the user who created it
-
+    title: str
+    description: str
+    due_date: Optional[str] = None
+    due_time: Optional[str] = None
+    is_completed: bool 
+    owner_id: int
     class Config:
         from_attributes = True

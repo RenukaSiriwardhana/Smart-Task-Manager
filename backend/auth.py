@@ -1,31 +1,26 @@
+import os
+from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import jwt
-from passlib.context import CryptContext
 
-# Secret key used to sign the JWT token (Keep this safe!)
-SECRET_KEY = "renuka_super_secret_key_for_task_app"
+# Argon2 hashing setup to eliminate system bcrypt version conflicts
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+
+# Get the secret key securely from environment variables
+SECRET_KEY = os.getenv("SECRET_KEY", "local_development_secret_key_change_in_prod")
 ALGORITHM = "HS256"
-# Token validity duration
-ACCESS_TOKEN_EXPIRE_MINUTES = 30 
 
-# Setup for password hashing using bcrypt
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# 1. Function to hash a plain text password
-def get_password_hash(password: str) -> str:
+# Encrypts the user password
+def get_password_hash(password: str):
     return pwd_context.hash(password)
 
-# 2. Function to verify a plain password against the hashed one in DB
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+# Validates plain password against the stored database hash
+def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-# 3. Function to generate a new JWT access token
+# Generates session JWT tokens valid for 30 minutes
 def create_access_token(data: dict):
     to_encode = data.copy()
-    # Calculate token expiration time
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(minutes=30)
     to_encode.update({"exp": expire})
-    
-    # Generate and return the encoded token string
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)

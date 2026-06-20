@@ -2,14 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg-gradient: linear-gradient(135deg, #e0e8f5 0%, #f4f7f6 100%);
-  --card-bg: #ffffff;
+  --bg-gradient: linear-gradient(135deg, #4d7ac2 0%, #3cc597 100%);
+  --card-bg: hsl(0, 100%, 100%);
   --text-main: #1e2022;
-  --text-muted: #959cb6;
+  --text-muted: #657bca;
   --primary: #0056FF; 
   --primary-hover: #0044cc;
-  --border-color: #e8ecef;
-  --input-bg: #ffffff;
+  --border-color: #e8eff5;
+  --input-bg: #ebe2e2;
 }
 
 * {
@@ -45,7 +45,7 @@ body {
 .auth-wrapper::before {
   width: 300px;
   height: 300px;
-  background: rgba(0, 86, 255, 0.1);
+  background: rgba(79, 104, 153, 0.1);
   top: -50px;
   left: -50px;
 }
@@ -73,12 +73,14 @@ body {
 .illustration-container {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-bottom: 20px;
-  height: 140px;
+  min-height: 120px; 
 }
 
 .illustration-container img {
-  height: 100%;
+  height: 120px;
+  width: auto;
   object-fit: contain;
 }
 
@@ -269,7 +271,7 @@ input:focus {
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background-color: #f8f9fa;
+  background-color: #deebf8;
   border-radius: 12px;
   margin-bottom: 10px;
 }
@@ -281,3 +283,108 @@ input:focus {
   font-weight: 600;
   cursor: pointer;
 }
+/* --- UI POLISH TWEAKS --- */
+
+
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #0056FF; 
+  cursor: pointer;
+  border-radius: 4px;
+  transition: transform 0.2s;
+}
+input[type="checkbox"]:hover {
+  transform: scale(1.1); 
+}
+
+
+.add-btn {
+  background: linear-gradient(135deg, #0056FF 0%, #0043c7 100%);
+  box-shadow: 0 4px 15px rgba(0, 86, 255, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.add-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 86, 255, 0.4);
+}
+
+
+.task-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid transparent;
+}
+.task-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  border-color: #cbd5e1;
+}
+
+
+.task-form input:focus {
+  outline: none;
+  border-color: #66728d;
+  box-shadow: 0 0 0 3px rgba(0, 86, 255, 0.15);
+  background-color: #f7e8e8;
+}
+
+
+.delete-btn {
+  font-weight: 600;
+  transition: all 0.2s;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+.delete-btn:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* --- SPECIAL HEADING & MAIN BOX ENHANCEMENTS --- */
+
+
+.dashboard-card {
+  background-color: #ffffff;
+  border-radius: 20px; 
+  box-shadow: 0 15px 40px rgba(0, 86, 255, 0.08); 
+  border: 1px solid rgba(0, 86, 255, 0.1); 
+  padding: 40px; 
+}
+
+
+.header h2 {
+  font-size: 2.2rem; 
+  font-weight: 800; 
+  
+  
+  
+  background: linear-gradient(135deg, #0056FF 0%, #00b4db 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  margin-bottom: 0;
+  letter-spacing: -0.5px;
+}
+/* --- BROWSER DATE & TIME PICKER ICONS FIX --- */
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 1; 
+  cursor: pointer;
+  transform: scale(1.4); 
+  
+  
+  filter: invert(24%) sepia(93%) saturate(30015%) hue-rotate(215deg) brightness(101%) contrast(106%);
+  
+  transition: transform 0.2s ease;
+  padding-right: 5px;
+}
+
+input[type="date"]:hover::-webkit-calendar-picker-indicator,
+input[type="time"]:hover::-webkit-calendar-picker-indicator {
+  transform: scale(1.6); /* Mouse එක ඒක උඩට ගෙනිච්චම තවත් ටිකක් ලොකු වෙලා පෙනේවි */
+}
+
