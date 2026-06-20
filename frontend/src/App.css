@@ -388,3 +388,38 @@ input[type="time"]:hover::-webkit-calendar-picker-indicator {
   transform: scale(1.6); /* Mouse එක ඒක උඩට ගෙනිච්චම තවත් ටිකක් ලොකු වෙලා පෙනේවි */
 }
 
+/* =========================================
+   📱 RESPONSIVE DESIGN (Mobile Devices)
+   ========================================= */
+
+/* Applies when the screen width is 768px or less (Mobile phones and small tablets) */
+@media (max-width: 768px) {
+  
+  /* Changes the main container from a side-by-side layout to a top-to-bottom stack */
+  .app-container {
+    flex-direction: column;
+    padding: 10px;
+    margin: 10px;
+  }
+
+  /* Expands the form and list to take up the full width (100%) of the mobile screen */
+  .task-form, .task-list {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  /* Reduces heading sizes for smaller screens to save space */
+  h1 {
+    font-size: 24px;
+  }
+  
+  h2 {
+    font-size: 20px;
+  }
+
+  /* Makes buttons full-width and slightly larger for easier tapping on mobile */
+  button {
+    width: 100%;
+    padding: 12px;
+  }
+}
