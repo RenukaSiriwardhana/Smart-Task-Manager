@@ -392,34 +392,38 @@ input[type="time"]:hover::-webkit-calendar-picker-indicator {
    📱 RESPONSIVE DESIGN (Mobile Devices)
    ========================================= */
 
-/* Applies when the screen width is 768px or less (Mobile phones and small tablets) */
 @media (max-width: 768px) {
-  
-  /* Changes the main container from a side-by-side layout to a top-to-bottom stack */
-  .app-container {
-    flex-direction: column;
-    padding: 10px;
-    margin: 10px;
+  /* Adjusts the main background wrappers for mobile screens */
+  .auth-wrapper, .dashboard-wrapper {
+    padding: 15px;
   }
 
-  /* Expands the form and list to take up the full width (100%) of the mobile screen */
-  .task-form, .task-list {
+  /* Makes the white cards take up the full width of the phone */
+  .auth-card, .dashboard-card {
     width: 100%;
-    margin-bottom: 20px;
+    padding: 20px 15px !important;
+    margin: 0;
+    box-sizing: border-box;
   }
 
-  /* Reduces heading sizes for smaller screens to save space */
-  h1 {
-    font-size: 24px;
-  }
-  
-  h2 {
-    font-size: 20px;
+  /* Stacks the Date and Time inputs vertically on small screens */
+  .task-form > div {
+    flex-direction: column;
   }
 
-  /* Makes buttons full-width and slightly larger for easier tapping on mobile */
-  button {
+  /* Adjusts heading sizes so they fit nicely on mobile */
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.3rem !important; }
+
+  /* Adds a bit more spacing inside task items to prevent text overlap */
+  .task-item {
+    padding: 12px;
+  }
+
+  /* Makes action buttons full-width and easier to tap */
+  .primary-btn, .add-btn, .logout-btn {
     width: 100%;
     padding: 12px;
+    margin-top: 10px;
   }
 }
