@@ -172,17 +172,21 @@ function App() {
     const response = await fetch(`${API_URL}/tasks/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ title: editTitle, due_date: editDate, due_time: editTime })
+      body: JSON.stringify({ 
+        title: editTitle, 
+        due_date: editDate, 
+        due_time: editTime 
+      })
     });
 
     if (response.ok) {
       setEditingTaskId(null);
-      fetchTasks(); // Reloads tasks with the new AI generated description!
+      fetchTasks();
     } else {
       alert("Error updating task");
     }
     setIsGenerating(false);
-  };
+  };git add .
 
   const toggleTaskExpand = (id) => {
     setExpandedTasks((prev) => ({ ...prev, [id]: !prev[id] }));
