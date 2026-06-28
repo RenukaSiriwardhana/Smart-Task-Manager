@@ -15,6 +15,7 @@ const getCurrentDate = () => {
   const day = String(now.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
+
 const getCurrentTime = () => {
   const now = new Date();
   return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
@@ -42,8 +43,12 @@ function App() {
 
   const [expandedTasks, setExpandedTasks] = useState({});
 
-  // --- 150ms BROWSER AUTOFILL KILLER TIMER ---
-  // Prevents browsers from forcefully auto-filling saved passwords into wrong fields
+  // --- EDITING STATE ---
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDate, setEditDate] = useState('');
+  const [editTime, setEditTime] = useState('');
+
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!token) {
@@ -55,7 +60,6 @@ function App() {
     return () => clearTimeout(timer);
   }, [isLoginMode, token, showLanding]);
 
-  // Fetch tasks immediately upon successful login
   useEffect(() => {
     if (token) {
       fetchTasks();
@@ -116,15 +120,13 @@ function App() {
     if (e) e.preventDefault();
     if (!newTaskTitle || !dueDate || !dueTime) return;
 
-    // --- NEW SAFETY CHECK: Prevent Past Date/Time Selection ---
     const selectedDateTime = new Date(`${dueDate}T${dueTime}`);
     const currentDateTime = new Date();
 
     if (selectedDateTime < currentDateTime) {
       alert("Please select a future date and time! You cannot add tasks to the past. 🚫");
-      return; // Stop execution here, prevent task creation
+      return; 
     }
-    // -----------------------------------------------------------
 
     setIsGenerating(true);
     const response = await fetch(`${API_URL}/tasks/`, {
@@ -153,6 +155,35 @@ function App() {
     if (response.ok) fetchTasks(); 
   };
 
+  // --- NEW EDITING FUNCTIONS ---
+  const startEditing = (task) => {
+    setEditingTaskId(task.id);
+    setEditTitle(task.title);
+    setEditDate(task.due_date);
+    setEditTime(task.due_time);
+  };
+
+  const cancelEditing = () => {
+    setEditingTaskId(null);
+  };
+
+  const saveEdit = async (id) => {
+    setIsGenerating(true);
+    const response = await fetch(`${API_URL}/tasks/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ title: editTitle, due_date: editDate, due_time: editTime })
+    });
+
+    if (response.ok) {
+      setEditingTaskId(null);
+      fetchTasks(); // Reloads tasks with the new AI generated description!
+    } else {
+      alert("Error updating task");
+    }
+    setIsGenerating(false);
+  };
+
   const toggleTaskExpand = (id) => {
     setExpandedTasks((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -161,7 +192,6 @@ function App() {
     if (e.key === 'Enter') handleAuth(e);
   };
 
-  // --- 1. RENDER LANDING PAGE ---
   if (showLanding && !token) {
     return (
       <div className="auth-wrapper">
@@ -181,8 +211,8 @@ function App() {
     );
   }
 
-  // --- 2. RENDER AUTH PAGE ---
   if (!token && !showLanding) {
+    // ... Auth page remains exactly the same ...
     return (
       <div className="auth-wrapper">
         <div className="auth-card">
@@ -197,40 +227,19 @@ function App() {
           <div className="auth-form" onKeyDown={handleKeyDown}>
             <div className="input-wrapper">
               <span className="input-icon">👤</span>
-              <input 
-                type="search" 
-                name={"usr_" + Math.random()} 
-                autoComplete="off"
-                placeholder="User name" 
-                value={username} 
-                onChange={(e) => setUsername(e.target.value)} 
-              />
+              <input type="search" name={"usr_" + Math.random()} autoComplete="off" placeholder="User name" value={username} onChange={(e) => setUsername(e.target.value)} />
             </div>
             
             <div className="input-wrapper">
               <span className="input-icon">🔒</span>
-              <input 
-                type={showPassword ? "text" : "password"} 
-                name={"pwd_" + Math.random()}
-                autoComplete="new-password"
-                placeholder="Password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-              />
+              <input type={showPassword ? "text" : "password"} name={"pwd_" + Math.random()} autoComplete="new-password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
               <span className="eye-icon" onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}>{showPassword ? "🙈" : "👁️"}</span>
             </div>
 
             {!isLoginMode && (
               <div className="input-wrapper">
                 <span className="input-icon">🔒</span>
-                <input 
-                  type={showConfirmPassword ? "text" : "password"} 
-                  name={"conf_" + Math.random()}
-                  autoComplete="new-password"
-                  placeholder="Confirm Password" 
-                  value={confirmPassword} 
-                  onChange={(e) => setConfirmPassword(e.target.value)} 
-                />
+                <input type={showConfirmPassword ? "text" : "password"} name={"conf_" + Math.random()} autoComplete="new-password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                 <span className="eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ cursor: 'pointer' }}>{showConfirmPassword ? "🙈" : "👁️"}</span>
               </div>
             )}
@@ -248,7 +257,6 @@ function App() {
     );
   }
 
-  // --- 3. RENDER DASHBOARD ---
   return (
     <div className="dashboard-wrapper">
       <div className="dashboard-card">
@@ -272,41 +280,66 @@ function App() {
           {tasks.length === 0 ? (
             <p className="no-tasks">No tasks yet. Add one above!</p>
           ) : (
-            tasks.map((task) => {
+            [...tasks].reverse().map((task) => {
               const lines = task.description ? task.description.split('\n').filter(line => line.trim() !== '') : [];
               const warningLine = lines.find(line => line.includes('🚨 WARNING:'));
               const otherLines = lines.filter(line => !line.includes('🚨 WARNING:'));
               const isExpanded = expandedTasks[task.id];
+              const isEditing = editingTaskId === task.id;
 
               return (
-                <li key={task.id} className="task-item" style={{ flexDirection: 'column', alignItems: 'flex-start', opacity: task.is_completed ? 0.6 : 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '5px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <input type="checkbox" checked={task.is_completed} onChange={() => toggleTaskCompletion(task)} style={{ width: '20px', height: '20px', cursor: 'pointer' }} />
-                      <span style={{ fontWeight: '600', fontSize: '1.05rem', color: '#1e2022', textDecoration: task.is_completed ? 'line-through' : 'none' }}>
-                        {task.title}
-                      </span>
+                <li key={task.id} className="task-item" style={{ flexDirection: 'column', alignItems: 'flex-start', opacity: task.is_completed && !isEditing ? 0.6 : 1 }}>
+                  
+                  {isEditing ? (
+                    // --- EDIT MODE UI ---
+                    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
+                      <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }} disabled={isGenerating} />
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} style={{ flex: 1, padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }} disabled={isGenerating} />
+                        <input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)} style={{ flex: 1, padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }} disabled={isGenerating} />
+                      </div>
+                      <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                        <button onClick={cancelEditing} style={{ padding: '6px 12px', background: '#e0e0e0', color: '#333', border: 'none', borderRadius: '5px', cursor: 'pointer' }} disabled={isGenerating}>Cancel</button>
+                        <button onClick={() => saveEdit(task.id)} style={{ padding: '6px 12px', background: '#0056FF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }} disabled={isGenerating}>
+                          {isGenerating ? "Updating AI..." : "Save"}
+                        </button>
+                      </div>
                     </div>
-                    <button onClick={() => deleteTask(task.id)} className="delete-btn">Delete</button>
-                  </div>
-                  
-                  <span style={{ fontSize: '0.8rem', color: '#666', marginBottom: '10px', display: 'flex', gap: '10px', marginLeft: '30px' }}>
-                    <span>📅 {task.due_date}</span> <span>⏰ {task.due_time}</span>
-                  </span>
-                  
-                  {task.description && !task.is_completed && (
-                    <div onClick={() => toggleTaskExpand(task.id)} style={{ fontSize: '0.85rem', color: '#4b5563', backgroundColor: '#a0b4c9', padding: '12px', borderRadius: '8px', width: '100%', borderLeft: '4px solid #0056FF', cursor: 'pointer', transition: 'all 0.3s ease' }}>
-                      <strong style={{ color: '#0056FF', display: 'block', marginBottom: '5px' }}>✨ AI Suggestion:</strong>
-                      {warningLine && <p style={{ color: '#d32f2f', fontWeight: 'bold', margin: '5px 0' }}>{warningLine}</p>}
-                      {!isExpanded ? (
-                        <p style={{ margin: '5px 0', color: '#0056FF', fontSize: '0.8rem', fontWeight: 'bold' }}>{warningLine ? "🔽 Click to see steps" : "🔽 Click to see AI steps"}</p>
-                      ) : (
-                        <div style={{ marginTop: '10px', borderTop: '1px solid #9aabc0', paddingTop: '10px' }}>
-                          {otherLines.map((line, index) => <p key={index} style={{ margin: '5px 0', lineHeight: '1.5' }}>{line}</p>)}
-                          <p style={{ margin: '10px 0 0 0', color: '#0056FF', fontSize: '0.8rem', fontWeight: 'bold' }}>🔼 Hide steps</p>
+                  ) : (
+                    // --- NORMAL VIEW MODE UI ---
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '5px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <input type="checkbox" checked={task.is_completed} onChange={() => toggleTaskCompletion(task)} style={{ width: '20px', height: '20px', cursor: 'pointer' }} disabled={isGenerating} />
+                          <span style={{ fontWeight: '600', fontSize: '1.05rem', color: '#1e2022', textDecoration: task.is_completed ? 'line-through' : 'none' }}>
+                            {task.title}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                          <button onClick={() => startEditing(task)} style={{ background: '#f0f4f8', color: '#0056FF', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer', fontSize: '0.85rem' }} disabled={isGenerating}>Edit</button>
+                          <button onClick={() => deleteTask(task.id)} className="delete-btn" disabled={isGenerating}>Delete</button>
+                        </div>
+                      </div>
+                      
+                      <span style={{ fontSize: '0.8rem', color: '#666', marginBottom: '10px', display: 'flex', gap: '10px', marginLeft: '30px' }}>
+                        <span>📅 {task.due_date}</span> <span>⏰ {task.due_time}</span>
+                      </span>
+                      
+                      {task.description && !task.is_completed && (
+                        <div onClick={() => toggleTaskExpand(task.id)} style={{ fontSize: '0.85rem', color: '#4b5563', backgroundColor: '#a0b4c9', padding: '12px', borderRadius: '8px', width: '100%', borderLeft: '4px solid #0056FF', cursor: 'pointer', transition: 'all 0.3s ease' }}>
+                          <strong style={{ color: '#0056FF', display: 'block', marginBottom: '5px' }}>✨ AI Suggestion:</strong>
+                          {warningLine && <p style={{ color: '#d32f2f', fontWeight: 'bold', margin: '5px 0' }}>{warningLine}</p>}
+                          {!isExpanded ? (
+                            <p style={{ margin: '5px 0', color: '#0056FF', fontSize: '0.8rem', fontWeight: 'bold' }}>{warningLine ? "🔽 Click to see steps" : "🔽 Click to see AI steps"}</p>
+                          ) : (
+                            <div style={{ marginTop: '10px', borderTop: '1px solid #9aabc0', paddingTop: '10px' }}>
+                              {otherLines.map((line, index) => <p key={index} style={{ margin: '5px 0', lineHeight: '1.5' }}>{line}</p>)}
+                              <p style={{ margin: '10px 0 0 0', color: '#0056FF', fontSize: '0.8rem', fontWeight: 'bold' }}>🔼 Hide steps</p>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
+                    </>
                   )}
                 </li>
               );

@@ -1,5 +1,12 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import date, time
+
+class TaskUpdate(BaseModel):
+    is_completed: Optional[bool] = None
+    title: Optional[str] = None
+    due_date: Optional[date] = None # සමහරවිට ඔයා මෙතන str පාවිච්චි කරනවා ඇති, එහෙම නම් str දෙන්න
+    due_time: Optional[time] = None # මෙතනත් str නම් str දෙන්න
 
 class UserCreate(BaseModel):
     username: str

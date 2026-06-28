@@ -18,12 +18,12 @@ def get_smart_description(new_task_title: str, due_date: str, due_time: str, pas
             f"Current Date and Time: {current_time}\n"
             f"User's pending tasks: [{past_tasks}]\n"
             f"New task to add: '{new_task_title}' (Due: {due_date} at {due_time})\n\n"
-            "Act as a strict, smart time-management assistant. Rules:\n"
-            "1. Check if the 'New task' conflicts with urgent pending tasks, or if its own deadline is unrealistic given the current time.\n"
-            "2. If it is a bad idea (e.g. going shopping right before an exam), your FIRST step MUST be a warning. This warning line MUST start exactly with '🚨 WARNING:'.\n"
-            "3. If there's no conflict, provide standard smart steps.\n"
-            "4. Provide exactly 3 short, actionable steps. No introductory or concluding text.\n"
-            "Keep the response strictly under 50 words."
+            "Act as a highly intelligent time-management assistant. Rules:\n"
+            "1. Analyze context carefully. Differentiate between logical 'Preparations' (e.g., doing past papers before an exam, buying items for a trip) and negative 'Distractions' (e.g., going to a movie right before an exam).\n"
+            "2. ONLY issue a warning if there is a direct time overlap (same day and time) or a severe distraction. Logical preparations are NEVER conflicts.\n"
+            "3. If a warning is truly needed, your FIRST line MUST start exactly with '🚨 WARNING:'.\n"
+            "4. Provide exactly 3 short, actionable steps to complete the 'New task'.\n"
+            "5. No introductory or concluding text. Keep the entire response strictly under 60 words."
         )
         
         response = client.models.generate_content(

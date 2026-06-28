@@ -94,14 +94,47 @@ def create_task(task: schemas.TaskCreate, db: Session = Depends(get_db), current
 def read_tasks(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     return db.query(models.Task).filter(models.Task.owner_id == current_user.id).all()
 
-# Updated PUT method to accept updates properly through a standard JSON payload body
+# Updated PUT method to handle full edits and regenerate AI descriptions
 @app.put("/tasks/{task_id}", response_model=schemas.TaskResponse)
 def update_task_status(task_id: int, task_update: schemas.TaskUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     db_task = db.query(models.Task).filter(models.Task.id == task_id, models.Task.owner_id == current_user.id).first()
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     
-    db_task.is_completed = task_update.is_completed
+    # Check if we need to regenerate the AI description (if title, date, or time changed)
+    needs_ai_update = False
+    
+    if task_update.title is not None and task_update.title != db_task.title:
+        db_task.title = task_update.title
+        needs_ai_update = True
+        
+    if task_update.due_date is not None and task_update.due_date != db_task.due_date:
+        db_task.due_date = task_update.due_date
+        needs_ai_update = True
+        
+    if task_update.due_time is not None and task_update.due_time != db_task.due_time:
+        db_task.due_time = task_update.due_time
+        needs_ai_update = True
+
+    # Update completion status if provided
+    if task_update.is_completed is not None:
+        db_task.is_completed = task_update.is_completed
+
+    # Regenerate AI Smart Description if core details changed
+    if needs_ai_update:
+        existing_tasks = db.query(models.Task).filter(
+            models.Task.owner_id == current_user.id, 
+            models.Task.is_completed == False,
+            models.Task.id != task_id # Exclude the task currently being edited
+        ).limit(5).all()
+        
+        task_history = ", ".join([f"{t.title} (Due: {t.due_date} {t.due_time})" for t in existing_tasks])
+        if not task_history:
+            task_history = "No past tasks yet."
+
+        smart_description = ai.get_smart_description(db_task.title, str(db_task.due_date), str(db_task.due_time), task_history)
+        db_task.description = smart_description
+
     db.commit()
     db.refresh(db_task)
     return db_task
